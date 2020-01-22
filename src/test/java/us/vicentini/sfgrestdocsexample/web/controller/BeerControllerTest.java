@@ -2,11 +2,14 @@ package us.vicentini.sfgrestdocsexample.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import us.vicentini.sfgrestdocsexample.domain.Beer;
 import us.vicentini.sfgrestdocsexample.repositories.BeerRepository;
@@ -24,6 +27,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@ExtendWith(RestDocumentationExtension.class)
+@AutoConfigureRestDocs
 @WebMvcTest(BeerController.class)
 @ComponentScan(basePackages = "us.vicentini.sfgrestdocsexample.web.mappers")
 class BeerControllerTest {
@@ -37,14 +42,16 @@ class BeerControllerTest {
     @MockBean
     BeerRepository beerRepository;
 
+
     @Test
     void getBeerById() throws Exception {
         given(beerRepository.findById(any())).willReturn(Optional.of(Beer.builder().build()));
 
-        mockMvc.perform(
-                get(BeerController.BASE_PATH + "/" + UUID.randomUUID().toString()).accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get(BeerController.BASE_PATH + "/" + UUID.randomUUID().toString())
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
+
 
     @Test
     void saveNewBeer() throws Exception {
@@ -57,6 +64,7 @@ class BeerControllerTest {
                 .andExpect(status().isCreated());
     }
 
+
     @Test
     void updateBeerById() throws Exception {
         BeerDto beerDto = getValidBeerDto();
@@ -67,6 +75,7 @@ class BeerControllerTest {
                                 .content(beerDtoJson))
                 .andExpect(status().isNoContent());
     }
+
 
     BeerDto getValidBeerDto(){
         return BeerDto.builder()
