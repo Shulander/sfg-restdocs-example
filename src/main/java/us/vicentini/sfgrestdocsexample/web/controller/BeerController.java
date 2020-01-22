@@ -15,7 +15,10 @@ import us.vicentini.sfgrestdocsexample.repositories.BeerRepository;
 import us.vicentini.sfgrestdocsexample.web.mappers.BeerMapper;
 import us.vicentini.sfgrestdocsexample.web.model.BeerDto;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @RequiredArgsConstructor
 @RequestMapping(BeerController.BASE_PATH)
@@ -24,6 +27,14 @@ public class BeerController {
     public static final String BASE_PATH = "/api/v1/beer";
     private final BeerMapper beerMapper;
     private final BeerRepository beerRepository;
+
+
+    @GetMapping
+    public List<BeerDto> findAll() {
+        return StreamSupport.stream(beerRepository.findAll().spliterator(), false)
+                .map(beerMapper::beerToBeerDto)
+                .collect(Collectors.toList());
+    }
 
 
     @GetMapping("/{beerId}")
