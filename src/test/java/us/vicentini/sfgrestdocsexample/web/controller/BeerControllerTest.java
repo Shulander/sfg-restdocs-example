@@ -13,6 +13,7 @@ import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import us.vicentini.sfgrestdocsexample.domain.Beer;
 import us.vicentini.sfgrestdocsexample.repositories.BeerRepository;
+import us.vicentini.sfgrestdocsexample.utils.ConstrainedFields;
 import us.vicentini.sfgrestdocsexample.web.model.BeerDto;
 import us.vicentini.sfgrestdocsexample.web.model.BeerStyleEnum;
 
@@ -82,20 +83,22 @@ class BeerControllerTest {
         BeerDto beerDto = getValidBeerDto();
         String beerDtoJson = objectMapper.writeValueAsString(beerDto);
 
+        ConstrainedFields fields = new ConstrainedFields(BeerDto.class);
+
         mockMvc.perform(post(BeerController.BASE_PATH + "/")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(beerDtoJson))
                 .andExpect(status().isCreated())
                 .andDo(document("v1/beer", requestFields(
-                        fieldWithPath("id").ignored(),
-                        fieldWithPath("version").ignored(),
-                        fieldWithPath("createdDate").ignored(),
-                        fieldWithPath("lastModifiedDate").ignored(),
-                        fieldWithPath("beerName").description("Beer Name"),
-                        fieldWithPath("beerStyle").description("Beer Style"),
-                        fieldWithPath("upc").description("UPC of Beer"),
-                        fieldWithPath("price").description("Price"),
-                        fieldWithPath("quantityOnHand").ignored()
+                        fields.withPath("id").ignored(),
+                        fields.withPath("version").ignored(),
+                        fields.withPath("createdDate").ignored(),
+                        fields.withPath("lastModifiedDate").ignored(),
+                        fields.withPath("beerName").description("Beer Name"),
+                        fields.withPath("beerStyle").description("Beer Style"),
+                        fields.withPath("upc").description("UPC of Beer"),
+                        fields.withPath("price").description("Price"),
+                        fields.withPath("quantityOnHand").ignored()
                 )));
     }
 
@@ -112,7 +115,7 @@ class BeerControllerTest {
     }
 
 
-    BeerDto getValidBeerDto(){
+    BeerDto getValidBeerDto() {
         return BeerDto.builder()
                 .beerName("Nice Ale")
                 .beerStyle(BeerStyleEnum.ALE)
@@ -121,5 +124,8 @@ class BeerControllerTest {
                 .build();
 
     }
+
+
+
 
 }
